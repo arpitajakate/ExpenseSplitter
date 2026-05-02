@@ -15,7 +15,7 @@
 
     <h2 class="text-center text-success mb-4">Dashboard</h2>
 
-    <!-- ================= EXPENSE LIST ================= -->
+
     <div class="card p-3 mb-4">
         <h4>All Expenses</h4>
 
@@ -55,7 +55,7 @@
     </div>
 
 
-    <!-- ================= BALANCES ================= -->
+   
     <div class="card p-3 mb-4">
         <h4>Balances</h4>
 
@@ -86,8 +86,6 @@
         </ul>
     </div>
 
-
-    <!-- ================= SETTLEMENT ================= -->
     <div class="card p-3 mb-4">
         <h4>Who Owes Whom 🔥</h4>
 
@@ -115,7 +113,7 @@
     </div>
 
 
-    <!-- BACK BUTTON -->
+   
     <div class="text-center">
         <a href="<%=request.getContextPath()%>/index.jsp" class="btn btn-primary">
             ➕ Add New Expense

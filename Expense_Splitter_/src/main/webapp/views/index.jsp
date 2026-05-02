@@ -41,7 +41,7 @@
 
         <form action="<%=request.getContextPath()%>/addExpense" method="post" onsubmit="return prepareData()">
 
-            <!-- NAMES -->
+         
             <div class="mb-3">
                 <label>Names</label>
                 <input type="text" id="nameInput" class="form-control"
@@ -54,19 +54,18 @@
                 <input type="hidden" name="participants" id="participants">
             </div>
 
-            <!-- Description -->
             <div class="mb-3">
                 <label>Description</label>
                 <input type="text" name="description" class="form-control" required>
             </div>
 
-            <!-- Amount -->
+         
             <div class="mb-3">
                 <label>Amount</label>
                 <input type="number" name="amount" class="form-control" required>
             </div>
 
-            <!-- PAYER -->
+        
             <div class="mb-3">
                 <label>Payer</label>
                 <select name="payer" id="payer" class="form-control" required>

@@ -15,7 +15,7 @@ public class ExpenseDAO {
         );
     }
 
-    // ADD
+   
     public void addExpense(Expense exp, List<String> participants) {
         try (Connection conn = getConnection()) {
 
@@ -48,7 +48,7 @@ public class ExpenseDAO {
         }
     }
 
-    // FETCH
+   
     public List<Expense> getAllExpenses() {
         List<Expense> list = new ArrayList<>();
 
@@ -72,7 +72,7 @@ public class ExpenseDAO {
         return list;
     }
 
-    // BALANCE
+   
     public Map<String, Double> getBalances() {
         Map<String, Double> map = new HashMap<>();
 
@@ -99,7 +99,7 @@ public class ExpenseDAO {
         return map;
     }
 
-    // SETTLEMENT
+    
     public List<String> getSettlement() {
 
         Map<String, Double> balance = getBalances();

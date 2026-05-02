@@ -6,7 +6,7 @@ const count = document.getElementById("count");
 const payerDropdown = document.getElementById("payer");
 const form = document.querySelector("form");
 
-// ✅ ENTER + COMMA support
+
 input.addEventListener("keyup", function (e) {
 
     if (e.key === "," || e.key === "Enter") {
@@ -22,7 +22,7 @@ input.addEventListener("keyup", function (e) {
     }
 });
 
-// UI refresh
+
 function refreshUI() {
 
     chipsDiv.innerHTML = "";
@@ -30,13 +30,13 @@ function refreshUI() {
 
     participants.forEach(name => {
 
-        // chip
+        
         let chip = document.createElement("div");
         chip.className = "chip";
         chip.innerHTML = name + " <span onclick='removeChip(\"" + name + "\")'>x</span>";
         chipsDiv.appendChild(chip);
 
-        // dropdown
+       
         let opt = document.createElement("option");
         opt.value = name;
         opt.text = name;

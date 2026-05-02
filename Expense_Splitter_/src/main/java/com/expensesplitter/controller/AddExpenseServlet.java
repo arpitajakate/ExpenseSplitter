@@ -23,10 +23,10 @@ public class AddExpenseServlet extends HttpServlet {
             String payer = request.getParameter("payer");
             String participantsStr = request.getParameter("participants");
 
-            // 🔥 DEBUG PRINT
+            
             System.out.println("Participants: " + participantsStr);
 
-            // ✅ VALIDATION
+          
             if (participantsStr == null || participantsStr.trim().isEmpty()) {
                 response.getWriter().println("Participants missing!");
                 return;
