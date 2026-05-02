@@ -10,29 +10,23 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
 
-
 @WebServlet("/addExpense")
 public class AddExpenseServlet extends HttpServlet {
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
             String desc = request.getParameter("description");
-            String amtStr = request.getParameter("amount");
+            double amount = Double.parseDouble(request.getParameter("amount"));
             String payer = request.getParameter("payer");
             String participantsStr = request.getParameter("participants");
 
-            
-            System.out.println("Participants: " + participantsStr);
-
-          
             if (participantsStr == null || participantsStr.trim().isEmpty()) {
                 response.getWriter().println("Participants missing!");
                 return;
             }
-
-            double amount = Double.parseDouble(amtStr);
 
             List<String> participants = new ArrayList<>();
             for (String p : participantsStr.split(",")) {
@@ -41,22 +35,24 @@ public class AddExpenseServlet extends HttpServlet {
                 }
             }
 
-            if (participants.size() == 0) {
-                response.getWriter().println("No valid participants!");
-                return;
-            }
-
             Expense exp = new Expense(desc, amount, payer);
 
             ExpenseDAO dao = new ExpenseDAO();
             dao.addExpense(exp, participants);
 
-           
             response.sendRedirect(request.getContextPath() + "/viewExpenses");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().println("ERROR: " + e.getMessage());
+            response.getWriter().println("Error: " + e.getMessage());
         }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+      
+        response.sendRedirect(request.getContextPath() + "/views/index.jsp");
     }
 }

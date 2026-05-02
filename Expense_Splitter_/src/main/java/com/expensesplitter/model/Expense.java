@@ -1,6 +1,5 @@
 package com.expensesplitter.model;
 
-
 public class Expense {
 
     private int id;

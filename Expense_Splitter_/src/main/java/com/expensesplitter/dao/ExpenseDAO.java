@@ -1,6 +1,8 @@
 package com.expensesplitter.dao;
 
 import com.expensesplitter.model.Expense;
+import com.expensesplitter.model.Split;
+
 import java.sql.*;
 import java.util.*;
 
@@ -15,8 +17,9 @@ public class ExpenseDAO {
         );
     }
 
-   
+    // ================= ADD EXPENSE =================
     public void addExpense(Expense exp, List<String> participants) {
+
         try (Connection conn = getConnection()) {
 
             String sql = "INSERT INTO expenses(title, amount, paid_by) VALUES(?,?,?)";
@@ -29,16 +32,19 @@ public class ExpenseDAO {
 
             ResultSet rs = ps.getGeneratedKeys();
             int expenseId = 0;
-            if (rs.next()) expenseId = rs.getInt(1);
+
+            if (rs.next()) {
+                expenseId = rs.getInt(1);
+            }
 
             double splitAmount = exp.getAmount() / participants.size();
 
+            String splitSql = "INSERT INTO splits(expense_id, participant, amount) VALUES(?,?,?)";
+            PreparedStatement ps2 = conn.prepareStatement(splitSql);
+
             for (String p : participants) {
-                PreparedStatement ps2 = conn.prepareStatement(
-                        "INSERT INTO splits(expense_id, participant, amount) VALUES(?,?,?)"
-                );
                 ps2.setInt(1, expenseId);
-                ps2.setString(2, p);
+                ps2.setString(2, p.trim());
                 ps2.setDouble(3, splitAmount);
                 ps2.executeUpdate();
             }
@@ -48,8 +54,9 @@ public class ExpenseDAO {
         }
     }
 
-   
+    // ================= GET ALL EXPENSES =================
     public List<Expense> getAllExpenses() {
+
         List<Expense> list = new ArrayList<>();
 
         try (Connection conn = getConnection()) {
@@ -72,20 +79,54 @@ public class ExpenseDAO {
         return list;
     }
 
-   
+    // ================= GET SPLITS =================
+    public Map<Integer, List<Split>> getSplits() {
+
+        Map<Integer, List<Split>> map = new HashMap<>();
+
+        try (Connection conn = getConnection()) {
+
+            String sql = "SELECT * FROM splits";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                int expenseId = rs.getInt("expense_id");
+                String name = rs.getString("participant");
+                double amt = rs.getDouble("amount");
+
+                Split s = new Split(expenseId, name, amt);
+
+                map.computeIfAbsent(expenseId, k -> new ArrayList<>()).add(s);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+
+    // ================= GET BALANCES =================
     public Map<String, Double> getBalances() {
+
         Map<String, Double> map = new HashMap<>();
 
         try (Connection conn = getConnection()) {
 
+            // subtract split amounts
             ResultSet rs = conn.createStatement().executeQuery("SELECT participant, amount FROM splits");
+
             while (rs.next()) {
                 String p = rs.getString("participant");
                 double amt = rs.getDouble("amount");
                 map.put(p, map.getOrDefault(p, 0.0) - amt);
             }
 
+            // add paid amounts
             ResultSet rs2 = conn.createStatement().executeQuery("SELECT paid_by, amount FROM expenses");
+
             while (rs2.next()) {
                 String p = rs2.getString("paid_by");
                 double amt = rs2.getDouble("amount");
@@ -99,7 +140,7 @@ public class ExpenseDAO {
         return map;
     }
 
-    
+    // ================= SETTLEMENT =================
     public List<String> getSettlement() {
 
         Map<String, Double> balance = getBalances();
@@ -133,14 +174,18 @@ public class ExpenseDAO {
 
             if (settle > 0) {
 
-                result.add(debtor + " → ₹" + String.format("%.2f", settle) + " → " + creditor);
+                result.add(
+                        debtor + " → ₹" + String.format("%.2f", settle) + " → " + creditor
+                );
 
                 list.get(i).setValue(debit + settle);
                 list.get(j).setValue(credit - settle);
+
             } else {
                 break;
             }
         }
 
         return result;
-    }}
+    }
+}
