@@ -17,9 +17,12 @@ public class ViewExpenseServlet extends HttpServlet {
             throws ServletException, IOException {
 
         ExpenseDAO dao = new ExpenseDAO();
+
         List<Expense> list = dao.getAllExpenses();
+        List<String> settlements = dao.getSettlement(); // 🔥 ON AGAIN
 
         request.setAttribute("expenses", list);
+        request.setAttribute("settlements", settlements);
 
         request.getRequestDispatcher("/views/dashboard.jsp")
                 .forward(request, response);
