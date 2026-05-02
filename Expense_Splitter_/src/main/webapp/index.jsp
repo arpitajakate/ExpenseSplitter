@@ -2,16 +2,12 @@
 <html>
 <head>
     <title>Expense Splitter</title>
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/views/style.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
 </head>
 
 <body>
 
-<div class="container">
-
 <h2>Expense Splitter</h2>
-
-<div class="card">
 
 <form action="<%=request.getContextPath()%>/addExpense" method="post">
 
@@ -33,13 +29,10 @@
 
 </form>
 
-</div>
+<br>
 
-<div class="card">
-    <a href="<%=request.getContextPath()%>/viewExpenses">View Expenses</a>
-</div>
-
-</div>
+<!-- FIXED LINK -->
+<a href="<%=request.getContextPath()%>/viewExpenses">View Expenses</a>
 
 <script>
 document.getElementById("names").addEventListener("input", function(){
@@ -53,7 +46,7 @@ document.getElementById("names").addEventListener("input", function(){
 
     arr.forEach(p => {
         let name = p.trim();
-        if(name !== "") {
+        if(name !== ""){
             cleanArr.push(name);
 
             let opt = document.createElement("option");

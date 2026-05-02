@@ -1,6 +1,7 @@
 package com.expensesplitter.controller;
 
 import com.expensesplitter.dao.ExpenseDAO;
+import com.expensesplitter.model.Expense;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -15,19 +16,25 @@ public class AddExpenseServlet extends HttpServlet {
 
         try {
             String desc = request.getParameter("description");
-            double amount = Double.parseDouble(request.getParameter("amount"));
+            String amtStr = request.getParameter("amount");
             String payer = request.getParameter("payer");
+            String participantsStr = request.getParameter("participants");
 
-            String[] arr = request.getParameter("participants").split(",");
-            List<String> participants = Arrays.asList(arr);
+            double amount = Double.parseDouble(amtStr);
+
+        
+            List<String> participants = Arrays.asList(participantsStr.split(","));
+
+            Expense exp = new Expense(desc, amount, payer);
 
             ExpenseDAO dao = new ExpenseDAO();
-            dao.addExpense(desc, payer, amount, participants);
+            dao.addExpense(exp, participants);
 
             response.sendRedirect("viewExpenses");
 
         } catch (Exception e) {
             e.printStackTrace();
+            response.getWriter().println("ERROR: " + e.getMessage());
         }
     }
 }

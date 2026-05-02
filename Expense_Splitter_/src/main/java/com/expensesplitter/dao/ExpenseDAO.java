@@ -6,12 +6,24 @@ import java.util.*;
 
 public class ExpenseDAO {
 
-    // ADD EXPENSE + SPLIT
-    public void addExpense(Expense exp, List<String> participants) {
+    Connection conn;
 
+    public ExpenseDAO() {
         try {
-            Connection conn = DBConnection.getConnection();
-
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            conn = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/expensesplitter",
+                "root",
+                "root"
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+  
+    public void addExpense(Expense exp, List<String> participants) {
+        try {
             String sql = "INSERT INTO expenses(title, amount, paid_by) VALUES(?,?,?)";
             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -28,36 +40,31 @@ public class ExpenseDAO {
                 expenseId = rs.getInt(1);
             }
 
-            // 🔥 Equal Split Logic
-            double share = exp.getAmount() / participants.size();
+            double splitAmount = exp.getAmount() / participants.size();
 
-            String splitSql = "INSERT INTO splits(expense_id, participant, amount) VALUES(?,?,?)";
-            PreparedStatement ps2 = conn.prepareStatement(splitSql);
+            String q2 = "INSERT INTO splits(expense_id, participant, amount) VALUES (?,?,?)";
+            PreparedStatement ps2 = conn.prepareStatement(q2);
 
             for (String p : participants) {
                 ps2.setInt(1, expenseId);
-                ps2.setString(2, p);
-                ps2.setDouble(3, share);
-                ps2.executeUpdate();
+                ps2.setString(2, p.trim()); // IMPORTANT
+                ps2.setDouble(3, splitAmount);
+                ps2.addBatch();
             }
+
+            ps2.executeBatch();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // GET ALL EXPENSES
+  
     public List<Expense> getAllExpenses() {
-
         List<Expense> list = new ArrayList<>();
 
         try {
-            Connection conn = DBConnection.getConnection();
-
-            String sql = "SELECT * FROM expenses";
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            ResultSet rs = ps.executeQuery();
+            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM expenses");
 
             while (rs.next()) {
                 Expense e = new Expense();
@@ -65,7 +72,6 @@ public class ExpenseDAO {
                 e.setTitle(rs.getString("title"));
                 e.setAmount(rs.getDouble("amount"));
                 e.setPaidBy(rs.getString("paid_by"));
-
                 list.add(e);
             }
 
@@ -75,9 +81,4 @@ public class ExpenseDAO {
 
         return list;
     }
-
-	public void addExpense(String desc, String payer, double amount, List<String> participants) {
-		// TODO Auto-generated method stub
-		
-	}
 }

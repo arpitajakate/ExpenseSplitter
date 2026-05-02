@@ -7,6 +7,7 @@ public class Expense {
     private double amount;
     private String paidBy;
 
+   
     public Expense() {}
 
     public Expense(String title, double amount, String paidBy) {
@@ -15,6 +16,7 @@ public class Expense {
         this.paidBy = paidBy;
     }
 
+   
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
