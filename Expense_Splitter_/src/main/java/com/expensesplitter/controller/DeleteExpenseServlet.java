@@ -22,7 +22,7 @@ public class DeleteExpenseServlet extends HttpServlet {
         try {
             String idStr = request.getParameter("id");
 
-            if (idStr == null) {
+            if (idStr == null || idStr.isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/views/index.jsp");
                 return;
             }
@@ -41,7 +41,8 @@ public class DeleteExpenseServlet extends HttpServlet {
             ps.close();
             conn.close();
 
-            response.sendRedirect(request.getContextPath() + "/viewExpense");
+            // ✅ MUST MATCH YOUR CONTROLLER
+            response.sendRedirect(request.getContextPath() + "/viewExpenses");
 
         } catch (Exception e) {
             e.printStackTrace();

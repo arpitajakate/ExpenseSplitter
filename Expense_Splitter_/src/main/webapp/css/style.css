@@ -5,25 +5,26 @@
     --glass: rgba(255, 255, 255, 0.65);
 }
 
-
+/* Background */
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #d8b4fe, #f5f3ff);
 }
 
-
+/* Container */
 .container {
     width: 85%;
     margin: auto;
 }
 
+/* Title */
 h2 {
     color: var(--primary);
     font-weight: 700;
 }
 
-
+/* Glass Card */
 .card {
     background: var(--glass) !important;
     backdrop-filter: blur(12px);
@@ -37,7 +38,7 @@ h2 {
     transform: translateY(-3px);
 }
 
-
+/* Inputs */
 .form-control {
     border-radius: 12px !important;
     border: 1px solid #ddd;
@@ -49,7 +50,7 @@ h2 {
     box-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
 }
 
-
+/* Buttons */
 .btn {
     border-radius: 12px !important;
     font-weight: 600;
@@ -66,6 +67,7 @@ h2 {
     box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
 }
 
+/* Table */
 .table {
     border-radius: 12px;
     overflow: hidden;
@@ -83,7 +85,7 @@ h2 {
     vertical-align: middle;
 }
 
-
+/* List group */
 .list-group-item {
     background: rgba(255,255,255,0.7) !important;
     border-radius: 10px;
@@ -91,17 +93,16 @@ h2 {
     border: none;
 }
 
-
-
+/* Chips */
 .chip {
     display: inline-flex;
     align-items: center;
     padding: 6px 12px;
     margin: 4px;
 
-    background: linear-gradient(90deg, #ede9fe, #ddd6fe); /* LIGHT PURPLE */
-    
-    color: #000000; 
+    background: linear-gradient(90deg, #ede9fe, #ddd6fe);
+    color: #000000;
+
     border-radius: 20px;
     font-size: 14px;
     font-weight: 600;
@@ -116,6 +117,8 @@ h2 {
     color: #dc2626;
     font-weight: bold;
 }
+
+/* Chips container */
 #chips {
     border: 1px solid #ddd;
     padding: 10px;
@@ -124,11 +127,12 @@ h2 {
     background: #faf5ff;
 }
 
+/* Badge */
 .badge {
     background: linear-gradient(90deg, #7c3aed, #a78bfa);
 }
 
-
+/* Avatar */
 .avatar {
     width: 35px;
     height: 35px;
@@ -141,7 +145,7 @@ h2 {
     font-weight: bold;
 }
 
-
+/* Avatar stack */
 .avatar-stack {
     display: flex;
     align-items: center;
@@ -165,6 +169,7 @@ h2 {
     margin-left: 0;
 }
 
+/* Icons */
 .bi-people-fill {
     color: var(--primary);
 }

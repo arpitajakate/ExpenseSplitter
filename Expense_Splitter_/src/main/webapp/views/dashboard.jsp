@@ -74,11 +74,7 @@
 				<td>
 
 				
-					<a href="<%=request.getContextPath()%>/editExpense?id=<%=e.getId()%>"
-   class="text-primary me-2">
-   <i class="bi bi-pencil-square"></i>
-</a>
-
+			
 				
 					<a href="<%=request.getContextPath()%>/deleteExpense?id=<%=e.getId()%>"
    class="text-danger"
