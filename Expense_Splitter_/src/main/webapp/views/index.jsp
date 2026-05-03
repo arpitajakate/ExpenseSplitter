@@ -5,13 +5,11 @@
     <title>Expense Splitter</title>
     <meta charset="UTF-8">
   
-    <!-- Bootstrap -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- ✅ ADD THIS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Your CSS -->
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
     <style>
         .chip {
@@ -93,9 +91,7 @@
         </form>
 
     </div>
-</div>
-
-<script>
+</div><script>
 let participants = [];
 
 const input = document.getElementById("nameInput");
@@ -106,6 +102,7 @@ const payer = document.getElementById("payer");
 
 input.addEventListener("keyup", function(e) {
     if (e.key === "," || e.key === "Enter") {
+
         let name = input.value.replace(",", "").trim();
 
         if (name !== "" && !participants.includes(name)) {
@@ -118,16 +115,19 @@ input.addEventListener("keyup", function(e) {
 });
 
 function render() {
+
     chipsDiv.innerHTML = "";
     payer.innerHTML = '<option value="">Select payer</option>';
 
     participants.forEach((p, index) => {
 
+     
         let chip = document.createElement("div");
         chip.className = "chip";
-        chip.innerHTML = p + ' <span onclick="remove(' + index + ')">×</span>';
+        chip.innerHTML = p + ' <span onclick="removeItem(' + index + ')">×</span>';
         chipsDiv.appendChild(chip);
 
+        
         let option = document.createElement("option");
         option.value = p;
         option.text = p;
@@ -138,11 +138,10 @@ function render() {
     count.innerText = "Participants: " + participants.length;
 }
 
-function remove(index) {
+function removeItem(index) {
     participants.splice(index, 1);
     render();
 }
 </script>
-
 </body>
 </html>

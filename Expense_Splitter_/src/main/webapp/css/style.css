@@ -2,29 +2,28 @@
     --primary: #7c3aed;
     --secondary: #a78bfa;
     --bg: #f5f3ff;
-    --glass: rgba(255, 255, 255, 0.6);
+    --glass: rgba(255, 255, 255, 0.65);
 }
 
-/* Background */
+
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #d8b4fe, #f5f3ff);
 }
 
-/* Container */
+
 .container {
     width: 85%;
     margin: auto;
 }
 
-/* Title */
 h2 {
     color: var(--primary);
     font-weight: 700;
 }
 
-/* Glass Card */
+
 .card {
     background: var(--glass) !important;
     backdrop-filter: blur(12px);
@@ -38,7 +37,7 @@ h2 {
     transform: translateY(-3px);
 }
 
-/* Inputs */
+
 .form-control {
     border-radius: 12px !important;
     border: 1px solid #ddd;
@@ -50,7 +49,7 @@ h2 {
     box-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
 }
 
-/* Buttons */
+
 .btn {
     border-radius: 12px !important;
     font-weight: 600;
@@ -67,7 +66,6 @@ h2 {
     box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
 }
 
-/* Table */
 .table {
     border-radius: 12px;
     overflow: hidden;
@@ -80,12 +78,12 @@ h2 {
 }
 
 .table td {
-    background: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.75);
     padding: 12px;
     vertical-align: middle;
 }
 
-/* List group */
+
 .list-group-item {
     background: rgba(255,255,255,0.7) !important;
     border-radius: 10px;
@@ -93,20 +91,44 @@ h2 {
     border: none;
 }
 
-/* Chips */
+
+
 .chip {
-    background: linear-gradient(90deg, #a78bfa, #c4b5fd);
-    color: white;
-    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
     padding: 6px 12px;
+    margin: 4px;
+
+    background: linear-gradient(90deg, #ede9fe, #ddd6fe); /* LIGHT PURPLE */
+    
+    color: #000000; 
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+
+    border: 1px solid #c4b5fd;
+    box-shadow: 0 2px 5px rgba(124, 58, 237, 0.15);
 }
 
-/* Badge */
+.chip span {
+    margin-left: 8px;
+    cursor: pointer;
+    color: #dc2626;
+    font-weight: bold;
+}
+#chips {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 10px;
+    min-height: 45px;
+    background: #faf5ff;
+}
+
 .badge {
     background: linear-gradient(90deg, #7c3aed, #a78bfa);
 }
 
-/* Avatar (payer) */
+
 .avatar {
     width: 35px;
     height: 35px;
@@ -119,41 +141,7 @@ h2 {
     font-weight: bold;
 }
 
-/* Avatar text */
-.avatar-group span {
-    font-weight: 500;
-    color: #4c1d95;
-}
 
-/* Avatar stack (overlapping) */
-.avatar-stack {
-    display: flex;
-    align-items: center;
-}
-
-.avatar-stack .avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #a78bfa);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    border: 2px solid white;
-    margin-left: -10px;
-}
-
-.avatar-stack .avatar:first-child {
-    margin-left: 0;
-}
-
-/* Icons styling */
-.bi-person-circle {
-    color: var(--primary);
-    font-size: 18px;
-}
 .avatar-stack {
     display: flex;
     align-items: center;
@@ -176,7 +164,6 @@ h2 {
 .avatar-emoji:first-child {
     margin-left: 0;
 }
-
 
 .bi-people-fill {
     color: var(--primary);

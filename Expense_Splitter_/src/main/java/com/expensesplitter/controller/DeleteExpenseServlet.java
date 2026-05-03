@@ -4,36 +4,48 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
+import com.expensesplitter.dao.DBConnection;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import com.expensesplitter.dao.DBConnection;
-
 @WebServlet("/deleteExpense")
 public class DeleteExpenseServlet extends HttpServlet {
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		try {
-			int id = Integer.parseInt(request.getParameter("id"));
+        try {
+            String idStr = request.getParameter("id");
 
-			Connection conn = DBConnection.getConnection();
+            if (idStr == null) {
+                response.sendRedirect(request.getContextPath() + "/views/index.jsp");
+                return;
+            }
 
-			PreparedStatement ps = conn.prepareStatement(
-				"DELETE FROM expenses WHERE id=?"
-			);
+            int id = Integer.parseInt(idStr);
 
-			ps.setInt(1, id);
-			ps.executeUpdate();
+            Connection conn = DBConnection.getConnection();
 
-			response.sendRedirect(request.getContextPath() + "/dashboard");
+            PreparedStatement ps = conn.prepareStatement(
+                    "DELETE FROM expenses WHERE id=?"
+            );
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+            ps.close();
+            conn.close();
+
+            response.sendRedirect(request.getContextPath() + "/viewExpense");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/views/index.jsp");
+        }
+    }
 }

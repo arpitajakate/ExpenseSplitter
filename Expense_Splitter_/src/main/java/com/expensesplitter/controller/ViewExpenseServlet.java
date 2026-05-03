@@ -4,9 +4,11 @@ import com.expensesplitter.dao.ExpenseDAO;
 import com.expensesplitter.model.Expense;
 import com.expensesplitter.model.Split;
 
-import jakarta.servlet.*;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.*;
@@ -14,16 +16,15 @@ import java.util.*;
 @WebServlet("/viewExpenses")
 public class ViewExpenseServlet extends HttpServlet {
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         ExpenseDAO dao = new ExpenseDAO();
 
-        // ================= FETCH DATA =================
         List<Expense> expenses = dao.getAllExpenses();
         Map<Integer, List<Split>> splitMap = dao.getSplits();
 
-        // ================= BALANCE CALC (OLD - KEEP SAME) =================
         Map<String, Double> balances = new HashMap<>();
         Set<String> people = new HashSet<>();
 
@@ -44,31 +45,24 @@ public class ViewExpenseServlet extends HttpServlet {
 
         for (Expense e : expenses) {
 
-            balances.put(
-                e.getPaidBy(),
-                balances.get(e.getPaidBy()) + e.getAmount()
-            );
+            balances.put(e.getPaidBy(),
+                    balances.get(e.getPaidBy()) + e.getAmount());
 
             List<Split> splits = splitMap.get(e.getId());
 
             if (splits != null) {
                 for (Split s : splits) {
-                    balances.put(
-                        s.getParticipant(),
-                        balances.get(s.getParticipant()) - s.getAmount()
-                    );
+                    balances.put(s.getParticipant(),
+                            balances.get(s.getParticipant()) - s.getAmount());
                 }
             }
         }
-
-        // ================= NEW LOGIC (DO NOT BREAK OLD) =================
 
         Map<String, Double> totalSplit = new HashMap<>();
         Map<String, Double> totalPaid = new HashMap<>();
         Map<String, Integer> txnCount = new HashMap<>();
         Map<String, Integer> payCount = new HashMap<>();
 
-        // initialize
         for (String p : people) {
             totalSplit.put(p, 0.0);
             totalPaid.put(p, 0.0);
@@ -76,77 +70,59 @@ public class ViewExpenseServlet extends HttpServlet {
             payCount.put(p, 0);
         }
 
-        // calculate
         for (Expense e : expenses) {
 
-            // paid
-            totalPaid.put(
-                e.getPaidBy(),
-                totalPaid.get(e.getPaidBy()) + e.getAmount()
-            );
+            totalPaid.put(e.getPaidBy(),
+                    totalPaid.get(e.getPaidBy()) + e.getAmount());
 
-            payCount.put(
-                e.getPaidBy(),
-                payCount.get(e.getPaidBy()) + 1
-            );
+            payCount.put(e.getPaidBy(),
+                    payCount.get(e.getPaidBy()) + 1);
 
-            // splits
             List<Split> splits = splitMap.get(e.getId());
 
             if (splits != null) {
                 for (Split s : splits) {
 
-                    totalSplit.put(
-                        s.getParticipant(),
-                        totalSplit.get(s.getParticipant()) + s.getAmount()
-                    );
+                    totalSplit.put(s.getParticipant(),
+                            totalSplit.get(s.getParticipant()) + s.getAmount());
 
-                    txnCount.put(
-                        s.getParticipant(),
-                        txnCount.get(s.getParticipant()) + 1
-                    );
+                    txnCount.put(s.getParticipant(),
+                            txnCount.get(s.getParticipant()) + 1);
                 }
             }
         }
 
-        // final balance
         Map<String, Double> finalBalance = new HashMap<>();
 
         for (String p : people) {
-            double bal = totalPaid.get(p) - totalSplit.get(p);
-            finalBalance.put(p, bal);
+            finalBalance.put(p,
+                    totalPaid.get(p) - totalSplit.get(p));
         }
 
-        // ================= SPLIT DISPLAY =================
         Map<Integer, String> splitDisplay = new HashMap<>();
 
         for (Integer expId : splitMap.keySet()) {
 
             List<Split> splits = splitMap.get(expId);
-
             StringBuilder sb = new StringBuilder();
-            sb.append("{\n");
+
+            sb.append("{");
 
             for (int i = 0; i < splits.size(); i++) {
-
                 Split s = splits.get(i);
 
-                sb.append("\"")
-                  .append(s.getParticipant())
-                  .append("\": ")
+                sb.append(s.getParticipant())
+                  .append(": ")
                   .append(String.format("%.2f", s.getAmount()));
 
-                if (i != splits.size() - 1) {
-                    sb.append(",\n");
-                }
+                if (i != splits.size() - 1) sb.append(", ");
             }
 
-            sb.append("\n}");
+            sb.append("}");
 
             splitDisplay.put(expId, sb.toString());
         }
 
-        // ================= SETTLEMENT (UNCHANGED) =================
         List<String> settlements = new ArrayList<>();
 
         List<String> debtors = new ArrayList<>();
@@ -171,9 +147,7 @@ public class ViewExpenseServlet extends HttpServlet {
 
             double amt = Math.min(debt, credit);
 
-            settlements.add(
-                d + " → ₹" + String.format("%.2f", amt) + " → " + c
-            );
+            settlements.add(d + " → ₹" + amt + " → " + c);
 
             balances.put(d, balances.get(d) + amt);
             balances.put(c, balances.get(c) - amt);
@@ -182,19 +156,18 @@ public class ViewExpenseServlet extends HttpServlet {
             if (Math.abs(balances.get(c)) < 0.01) j++;
         }
 
-        // ================= SEND TO JSP =================
         request.setAttribute("expenses", expenses);
-        request.setAttribute("balances", balances); // old
+        request.setAttribute("balances", balances);
         request.setAttribute("splitDisplay", splitDisplay);
         request.setAttribute("settlements", settlements);
 
-        // NEW DATA
         request.setAttribute("totalSplit", totalSplit);
         request.setAttribute("totalPaid", totalPaid);
         request.setAttribute("txnCount", txnCount);
         request.setAttribute("payCount", payCount);
         request.setAttribute("finalBalance", finalBalance);
 
-        request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/dashboard.jsp")
+               .forward(request, response);
     }
 }

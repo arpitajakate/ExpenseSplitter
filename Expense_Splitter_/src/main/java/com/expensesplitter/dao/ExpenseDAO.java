@@ -17,7 +17,6 @@ public class ExpenseDAO {
         );
     }
 
-    // ================= ADD EXPENSE =================
     public void addExpense(Expense exp, List<String> participants) {
 
         try (Connection conn = getConnection()) {
@@ -54,7 +53,7 @@ public class ExpenseDAO {
         }
     }
 
-    // ================= GET ALL EXPENSES =================
+   
     public List<Expense> getAllExpenses() {
 
         List<Expense> list = new ArrayList<>();
@@ -79,7 +78,6 @@ public class ExpenseDAO {
         return list;
     }
 
-    // ================= GET SPLITS =================
     public Map<Integer, List<Split>> getSplits() {
 
         Map<Integer, List<Split>> map = new HashMap<>();
@@ -108,7 +106,7 @@ public class ExpenseDAO {
         return map;
     }
 
-    // ================= GET BALANCES =================
+  
     public Map<String, Double> getBalances() {
 
         Map<String, Double> map = new HashMap<>();
@@ -124,7 +122,7 @@ public class ExpenseDAO {
                 map.put(p, map.getOrDefault(p, 0.0) - amt);
             }
 
-            // add paid amounts
+
             ResultSet rs2 = conn.createStatement().executeQuery("SELECT paid_by, amount FROM expenses");
 
             while (rs2.next()) {
@@ -140,7 +138,7 @@ public class ExpenseDAO {
         return map;
     }
 
-    // ================= SETTLEMENT =================
+
     public List<String> getSettlement() {
 
         Map<String, Double> balance = getBalances();
