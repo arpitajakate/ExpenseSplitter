@@ -4,10 +4,15 @@
 <head>
     <title>Expense Splitter</title>
     <meta charset="UTF-8">
+  
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
+    <!-- ✅ ADD THIS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
     <style>
         .chip {
             display: inline-flex;
@@ -42,7 +47,7 @@
 
     <h2 class="text-center fw-bold mb-4 text-dark">Expense Splitter</h2>
 
-    <div class="card p-4 shadow-sm">
+  <div class="card p-4">
 
         <form action="<%=request.getContextPath()%>/addExpense" method="post">
 
