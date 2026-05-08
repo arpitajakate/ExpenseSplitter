@@ -7,17 +7,16 @@
 <head>
     <title>Dashboard</title>
     <meta charset="UTF-8">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 </head>
 
-<body class="bg-light">
+<body class="dashboard-body">
 
-<div class="container mt-5">
+<div class="container mt-5 dashboard">
 
-    <h2 class="text-center fw-bold mb-4 text-dark">Dashboard</h2>
+    <h2 class="text-center fw-bold mb-4">Expense Dashboard</h2>
 
 <%
 List<Expense> expenses = (List<Expense>) request.getAttribute("expenses");
@@ -30,153 +29,190 @@ Map<String, Double> finalBalance = (Map<String, Double>) request.getAttribute("f
 %>
 
 <!-- EXPENSE TABLE -->
-<div class="card shadow-sm p-3 mb-4">
+<div class="card mb-4">
 
-    <div class="d-flex justify-content-between">
-        <h4 class="fw-bold">Expense Details</h4>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-        <span class="fw-semibold">
-            <i class="bi bi-people-fill me-2"></i>
-            Total Expense: ₹
+        <h4 class="fw-bold m-0">Expense Details</h4>
+
+        <span class="total-expense">
+            Total Expense ₹
             <%
-            double total = 0;
-            if (expenses != null) {
-                for (Expense e : expenses) {
-                    total += e.getAmount();
+                double total = 0;
+                if (expenses != null) {
+                    for (Expense e : expenses) {
+                        total += e.getAmount();
+                    }
                 }
-            }
             %>
             <%=String.format("%.2f", total)%>
         </span>
+
     </div>
 
-    <table class="table table-bordered mt-3 align-middle">
-        <thead>
-        <tr>
-            <th>Action</th>
-            <th>Description</th>
-            <th>Payer</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Split</th>
-        </tr>
-        </thead>
+    <div class="table-responsive mt-3">
 
-        <tbody>
-        <%
-        if (expenses != null && !expenses.isEmpty()) {
-            for (Expense e : expenses) {
-        %>
+        <table class="table align-middle">
 
-        <tr>
-            <td>
-                <a href="<%=request.getContextPath()%>/deleteExpense?id=<%=e.getId()%>"
-                   class="text-danger"
-                   onclick="return confirm('Delete this expense?');">
-                    <i class="bi bi-trash"></i>
-                </a>
-            </td>
+            <thead>
+            <tr>
+                <th>Action</th>
+                <th>Description</th>
+                <th>Payer</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Split</th>
+            </tr>
+            </thead>
 
-            <td><%=e.getTitle()%></td>
-            <td><%=e.getPaidBy()%></td>
-            <td>₹<%=String.format("%.2f", e.getAmount())%></td>
+            <tbody>
 
-            <td>
-                <%= e.getDate() != null
+            <%
+            if (expenses != null && !expenses.isEmpty()) {
+                for (Expense e : expenses) {
+            %>
+
+            <tr>
+
+                <td>
+                    <a href="<%=request.getContextPath()%>/deleteExpense?id=<%=e.getId()%>"
+                       class="text-danger"
+                       onclick="return confirm('Delete this expense?');">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+
+                <td><%=e.getTitle()%></td>
+                <td><%=e.getPaidBy()%></td>
+                <td>₹<%=String.format("%.2f", e.getAmount())%></td>
+                <td>
+                    <%= e.getDate() != null
                         ? new java.text.SimpleDateFormat("dd-MM-yyyy").format(e.getDate())
                         : "-" %>
-            </td>
+                </td>
 
-            <td>
-                <pre><%=splitDisplay != null ? splitDisplay.get(e.getId()) : ""%></pre>
-            </td>
-        </tr>
+                <td><pre><%=splitDisplay != null ? splitDisplay.get(e.getId()) : ""%></pre></td>
+
+            </tr>
+
+            <%
+                }
+            } else {
+            %>
+
+            <tr>
+                <td colspan="6" class="text-center">No data</td>
+            </tr>
+
+            <%
+            }
+            %>
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+<!-- BALANCE -->
+<div class="card mb-4">
+
+    <h4 class="fw-bold mb-3">Balances</h4>
+
+    <div class="table-responsive">
+
+        <table class="table align-middle">
+
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Split</th>
+                <th>Paid</th>
+                <th>Balance</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <%
+            if (totalSplit != null) {
+                for (String person : totalSplit.keySet()) {
+            %>
+
+            <tr>
+
+                <td><b><%=person%></b></td>
+                <td>₹<%=String.format("%.2f", totalSplit.get(person))%></td>
+                <td>₹<%=String.format("%.2f", totalPaid.get(person))%></td>
+
+                <td>
+                    <%
+                        double amt = finalBalance.get(person);
+                        if (amt < 0) {
+                    %>
+                    <span class="text-danger">₹<%=String.format("%.2f", amt)%></span>
+                    <%
+                        } else {
+                    %>
+                    <span class="text-success">₹<%=String.format("%.2f", amt)%></span>
+                    <%
+                        }
+                    %>
+                </td>
+
+            </tr>
+
+            <%
+                }
+            }
+            %>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- SETTLEMENT -->
+<div class="card mb-4">
+
+    <h4 class="fw-bold mb-3">Settlement</h4>
+
+    <ul class="list-group">
+
+        <%
+        if (settlements != null && !settlements.isEmpty()) {
+            for (String s : settlements) {
+        %>
+
+        <li class="list-group-item"><%=s%></li>
 
         <%
             }
         } else {
         %>
 
-        <tr>
-            <td colspan="6" class="text-center">No data</td>
-        </tr>
-
-        <% } %>
-        </tbody>
-    </table>
-</div>
-
-<!-- BALANCES -->
-<div class="card shadow-sm p-3 mb-4">
-    <h4 class="fw-bold mb-3">Balances</h4>
-
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Split</th>
-            <th>Paid</th>
-            <th>Balance</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <%
-        if (totalSplit != null) {
-            for (String person : totalSplit.keySet()) {
-        %>
-
-        <tr>
-            <td><b><%=person%></b></td>
-            <td>₹<%=String.format("%.2f", totalSplit.get(person))%></td>
-            <td>₹<%=String.format("%.2f", totalPaid.get(person))%></td>
-            <td>
-                <%
-                double amt = finalBalance.get(person);
-                if (amt < 0) {
-                %>
-                <span class="text-danger">₹<%=String.format("%.2f", amt)%></span>
-                <%
-                } else {
-                %>
-                <span class="text-success">₹<%=String.format("%.2f", amt)%></span>
-                <%
-                }
-                %>
-            </td>
-        </tr>
+        <li class="list-group-item text-center">No settlements required</li>
 
         <%
-            }
         }
         %>
-        </tbody>
-    </table>
-</div>
 
-<!-- SETTLEMENT -->
-<div class="card shadow-sm p-3 mb-4">
-    <h4 class="fw-bold">Settlement</h4>
-
-    <ul class="list-group">
-        <%
-        if (settlements != null) {
-            for (String s : settlements) {
-        %>
-        <li class="list-group-item"><%=s%></li>
-        <%
-            }
-        }
-        %>
     </ul>
+
 </div>
 
 <!-- BUTTON -->
-<div class="text-center mb-4">
+<div class="text-center mb-5">
+
     <a href="<%=request.getContextPath()%>/views/index.jsp"
-       class="btn btn-primary px-4 py-2">
+       class="btn btn-primary px-4 py-3">
         ➕ Add New Expense
     </a>
+
 </div>
 
 </div>

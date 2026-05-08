@@ -6,15 +6,15 @@
     <meta charset="UTF-8">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 </head>
 
-<body class="bg-light">
+<body class="index-body">
 
 <div class="container mt-5">
 
-    <h2 class="text-center fw-bold mb-4 text-dark">Expense Splitter</h2>
+    <h2 class="text-center fw-bold mb-4">Expense Splitter</h2>
 
     <div class="card p-4">
 
@@ -29,9 +29,7 @@
 
                 <div id="chips" class="mt-2"></div>
 
-                <span class="badge bg-primary mt-2" id="count">
-                    Participants: 0
-                </span>
+                <span class="badge mt-2" id="count">Participants: 0</span>
 
                 <input type="hidden" name="participants" id="participants">
             </div>
@@ -69,8 +67,7 @@
                 </select>
             </div>
 
-            <!-- Submit -->
-            <button type="submit" class="btn btn-primary w-100 mt-3">
+            <button type="submit" class="btn btn-primary w-100">
                 ➕ Add Expense
             </button>
 
@@ -90,7 +87,6 @@ const payer = document.getElementById("payer");
 const splitType = document.getElementById("splitType");
 const splitInputsDiv = document.getElementById("splitInputs");
 
-// Add participants
 input.addEventListener("keyup", function (e) {
     if (e.key === "," || e.key === "Enter") {
 
@@ -106,13 +102,11 @@ input.addEventListener("keyup", function (e) {
     }
 });
 
-// Render UI
 function render() {
     chipsDiv.innerHTML = "";
     payer.innerHTML = '<option value="">Select payer</option>';
 
     participants.forEach((p, index) => {
-
         let chip = document.createElement("div");
         chip.className = "chip";
         chip.innerHTML = p + ' <span onclick="removeItem(' + index + ')">×</span>';
@@ -128,17 +122,14 @@ function render() {
     count.innerText = "Participants: " + participants.length;
 }
 
-// Remove participant
 function removeItem(index) {
     participants.splice(index, 1);
     render();
     renderSplitInputs();
 }
 
-// Split type change
 splitType.addEventListener("change", renderSplitInputs);
 
-// Render split inputs
 function renderSplitInputs() {
     splitInputsDiv.innerHTML = "";
 
@@ -150,11 +141,9 @@ function renderSplitInputs() {
         input.name = "split_" + p;
         input.required = true;
 
-        if (splitType.value === "exact") {
-            input.placeholder = p + " amount";
-        } else {
-            input.placeholder = p + " %";
-        }
+        input.placeholder = splitType.value === "exact"
+            ? p + " amount"
+            : p + " %";
 
         splitInputsDiv.appendChild(input);
     });
