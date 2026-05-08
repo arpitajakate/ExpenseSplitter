@@ -22,9 +22,22 @@ public class ViewExpenseServlet extends HttpServlet {
 
         ExpenseDAO dao = new ExpenseDAO();
 
-        List<Expense> expenses = dao.getAllExpenses();
+        String start = request.getParameter("start");
+        String end = request.getParameter("end");
+
+        List<Expense> expenses;
+
+        if (start != null && end != null && !start.isEmpty() && !end.isEmpty()) {
+            expenses = dao.getExpensesByDate(start, end);
+        } else {
+            expenses = dao.getAllExpenses();
+        }
+
         Map<Integer, List<Split>> splitMap = dao.getSplits();
 
+        // =========================
+        // BALANCE CALCULATION
+        // =========================
         Map<String, Double> balances = new HashMap<>();
         Set<String> people = new HashSet<>();
 
@@ -44,7 +57,6 @@ public class ViewExpenseServlet extends HttpServlet {
         }
 
         for (Expense e : expenses) {
-
             balances.put(e.getPaidBy(),
                     balances.get(e.getPaidBy()) + e.getAmount());
 
@@ -58,16 +70,15 @@ public class ViewExpenseServlet extends HttpServlet {
             }
         }
 
+        // =========================
+        // TOTAL SPLIT & PAID
+        // =========================
         Map<String, Double> totalSplit = new HashMap<>();
         Map<String, Double> totalPaid = new HashMap<>();
-        Map<String, Integer> txnCount = new HashMap<>();
-        Map<String, Integer> payCount = new HashMap<>();
 
         for (String p : people) {
             totalSplit.put(p, 0.0);
             totalPaid.put(p, 0.0);
-            txnCount.put(p, 0);
-            payCount.put(p, 0);
         }
 
         for (Expense e : expenses) {
@@ -75,19 +86,12 @@ public class ViewExpenseServlet extends HttpServlet {
             totalPaid.put(e.getPaidBy(),
                     totalPaid.get(e.getPaidBy()) + e.getAmount());
 
-            payCount.put(e.getPaidBy(),
-                    payCount.get(e.getPaidBy()) + 1);
-
             List<Split> splits = splitMap.get(e.getId());
 
             if (splits != null) {
                 for (Split s : splits) {
-
                     totalSplit.put(s.getParticipant(),
                             totalSplit.get(s.getParticipant()) + s.getAmount());
-
-                    txnCount.put(s.getParticipant(),
-                            txnCount.get(s.getParticipant()) + 1);
                 }
             }
         }
@@ -99,6 +103,9 @@ public class ViewExpenseServlet extends HttpServlet {
                     totalPaid.get(p) - totalSplit.get(p));
         }
 
+        // =========================
+        // SPLIT DISPLAY
+        // =========================
         Map<Integer, String> splitDisplay = new HashMap<>();
 
         for (Integer expId : splitMap.keySet()) {
@@ -123,51 +130,62 @@ public class ViewExpenseServlet extends HttpServlet {
             splitDisplay.put(expId, sb.toString());
         }
 
+        // =========================
+        // ✅ SMART SETTLEMENT (MIN CASH FLOW)
+        // =========================
         List<String> settlements = new ArrayList<>();
 
-        List<String> debtors = new ArrayList<>();
-        List<String> creditors = new ArrayList<>();
+        List<Map.Entry<String, Double>> list = new ArrayList<>(balances.entrySet());
 
-        for (String p : balances.keySet()) {
-            double amt = balances.get(p);
+        // Sort balances
+        list.sort(Map.Entry.comparingByValue());
 
-            if (amt < 0) debtors.add(p);
-            else if (amt > 0) creditors.add(p);
+        int i = 0;
+        int j = list.size() - 1;
+
+        while (i < j) {
+
+            String debtor = list.get(i).getKey();
+            double debit = list.get(i).getValue();
+
+            String creditor = list.get(j).getKey();
+            double credit = list.get(j).getValue();
+
+            // skip settled
+            if (Math.abs(debit) < 0.01) {
+                i++;
+                continue;
+            }
+
+            if (Math.abs(credit) < 0.01) {
+                j--;
+                continue;
+            }
+
+            double settleAmount = Math.min(-debit, credit);
+
+            // ✅ formatted output
+            settlements.add(
+                debtor + " pays ₹" + String.format("%.2f", settleAmount) + " to " + creditor
+            );
+
+            // update balances
+            list.get(i).setValue(debit + settleAmount);
+            list.get(j).setValue(credit - settleAmount);
         }
 
-        int i = 0, j = 0;
-
-        while (i < debtors.size() && j < creditors.size()) {
-
-            String d = debtors.get(i);
-            String c = creditors.get(j);
-
-            double debt = -balances.get(d);
-            double credit = balances.get(c);
-
-            double amt = Math.min(debt, credit);
-
-            settlements.add(d + " → ₹" + amt + " → " + c);
-
-            balances.put(d, balances.get(d) + amt);
-            balances.put(c, balances.get(c) - amt);
-
-            if (Math.abs(balances.get(d)) < 0.01) i++;
-            if (Math.abs(balances.get(c)) < 0.01) j++;
-        }
-
+        // =========================
+        // SEND TO JSP
+        // =========================
         request.setAttribute("expenses", expenses);
-        request.setAttribute("balances", balances);
         request.setAttribute("splitDisplay", splitDisplay);
         request.setAttribute("settlements", settlements);
 
         request.setAttribute("totalSplit", totalSplit);
         request.setAttribute("totalPaid", totalPaid);
-        request.setAttribute("txnCount", txnCount);
-        request.setAttribute("payCount", payCount);
         request.setAttribute("finalBalance", finalBalance);
 
         request.getRequestDispatcher("/views/dashboard.jsp")
-               .forward(request, response);
+                .forward(request, response);
     }
 }

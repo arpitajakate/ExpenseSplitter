@@ -6,7 +6,7 @@ const count = document.getElementById("count");
 const payerDropdown = document.getElementById("payer");
 const form = document.querySelector("form");
 
-
+// Add participant on comma or Enter
 input.addEventListener("keyup", function (e) {
 
     if (e.key === "," || e.key === "Enter") {
@@ -22,7 +22,7 @@ input.addEventListener("keyup", function (e) {
     }
 });
 
-
+// Refresh UI
 function refreshUI() {
 
     chipsDiv.innerHTML = "";
@@ -30,13 +30,13 @@ function refreshUI() {
 
     participants.forEach(name => {
 
-        
+        // Chip UI
         let chip = document.createElement("div");
         chip.className = "chip";
         chip.innerHTML = name + " <span onclick='removeChip(\"" + name + "\")'>x</span>";
         chipsDiv.appendChild(chip);
 
-       
+        // Dropdown option
         let opt = document.createElement("option");
         opt.value = name;
         opt.text = name;
@@ -46,12 +46,13 @@ function refreshUI() {
     count.innerText = "Participants: " + participants.length;
 }
 
-
+// Remove participant
 function removeChip(name) {
     participants = participants.filter(p => p !== name);
     refreshUI();
 }
 
+// Submit validation
 form.addEventListener("submit", function (e) {
 
     if (participants.length === 0) {
@@ -60,8 +61,7 @@ form.addEventListener("submit", function (e) {
         return;
     }
 
-    let data = participants.join(",");
-    document.getElementById("participants").value = data;
+    document.getElementById("participants").value = participants.join(",");
 
-    console.log("Sending participants:", data); // 🔥 DEBUG
+    console.log("Sending participants:", participants.join(","));
 });

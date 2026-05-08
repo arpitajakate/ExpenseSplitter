@@ -4,39 +4,10 @@
 <head>
     <title>Expense Splitter</title>
     <meta charset="UTF-8">
-  
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
-    <style>
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            margin: 4px;
-            background: #ede9fe;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-
-        .chip span {
-            margin-left: 8px;
-            cursor: pointer;
-            color: red;
-            font-weight: bold;
-        }
-
-        #chips {
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 8px;
-            min-height: 45px;
-            background: #faf5ff;
-        }
-    </style>
 </head>
 
 <body class="bg-light">
@@ -45,11 +16,11 @@
 
     <h2 class="text-center fw-bold mb-4 text-dark">Expense Splitter</h2>
 
-  <div class="card p-4">
+    <div class="card p-4">
 
         <form action="<%=request.getContextPath()%>/addExpense" method="post">
 
-          
+            <!-- Participants -->
             <div class="mb-3">
                 <label class="fw-semibold">Participants</label>
 
@@ -65,17 +36,32 @@
                 <input type="hidden" name="participants" id="participants">
             </div>
 
+            <!-- Description -->
             <div class="mb-3">
                 <label class="fw-semibold">Description</label>
                 <input type="text" name="description" class="form-control" required>
             </div>
 
+            <!-- Amount -->
             <div class="mb-3">
                 <label class="fw-semibold">Amount</label>
                 <input type="number" name="amount" class="form-control" required>
             </div>
 
-       
+            <!-- Split Type -->
+            <div class="mb-3">
+                <label class="fw-semibold">Split Type</label>
+                <select name="splitType" id="splitType" class="form-control">
+                    <option value="equal">Equal</option>
+                    <option value="exact">Exact</option>
+                    <option value="percentage">Percentage</option>
+                </select>
+            </div>
+
+            <!-- Dynamic Inputs -->
+            <div id="splitInputs" class="mb-3"></div>
+
+            <!-- Payer -->
             <div class="mb-3">
                 <label class="fw-semibold">Payer</label>
                 <select name="payer" id="payer" class="form-control" required>
@@ -83,7 +69,7 @@
                 </select>
             </div>
 
-           
+            <!-- Submit -->
             <button type="submit" class="btn btn-primary w-100 mt-3">
                 ➕ Add Expense
             </button>
@@ -91,7 +77,9 @@
         </form>
 
     </div>
-</div><script>
+</div>
+
+<script>
 let participants = [];
 
 const input = document.getElementById("nameInput");
@@ -99,8 +87,11 @@ const chipsDiv = document.getElementById("chips");
 const hidden = document.getElementById("participants");
 const count = document.getElementById("count");
 const payer = document.getElementById("payer");
+const splitType = document.getElementById("splitType");
+const splitInputsDiv = document.getElementById("splitInputs");
 
-input.addEventListener("keyup", function(e) {
+// Add participants
+input.addEventListener("keyup", function (e) {
     if (e.key === "," || e.key === "Enter") {
 
         let name = input.value.replace(",", "").trim();
@@ -108,26 +99,25 @@ input.addEventListener("keyup", function(e) {
         if (name !== "" && !participants.includes(name)) {
             participants.push(name);
             render();
+            renderSplitInputs();
         }
 
         input.value = "";
     }
 });
 
+// Render UI
 function render() {
-
     chipsDiv.innerHTML = "";
     payer.innerHTML = '<option value="">Select payer</option>';
 
     participants.forEach((p, index) => {
 
-     
         let chip = document.createElement("div");
         chip.className = "chip";
         chip.innerHTML = p + ' <span onclick="removeItem(' + index + ')">×</span>';
         chipsDiv.appendChild(chip);
 
-        
         let option = document.createElement("option");
         option.value = p;
         option.text = p;
@@ -138,10 +128,38 @@ function render() {
     count.innerText = "Participants: " + participants.length;
 }
 
+// Remove participant
 function removeItem(index) {
     participants.splice(index, 1);
     render();
+    renderSplitInputs();
+}
+
+// Split type change
+splitType.addEventListener("change", renderSplitInputs);
+
+// Render split inputs
+function renderSplitInputs() {
+    splitInputsDiv.innerHTML = "";
+
+    if (splitType.value === "equal") return;
+
+    participants.forEach(p => {
+        let input = document.createElement("input");
+        input.className = "form-control mt-2";
+        input.name = "split_" + p;
+        input.required = true;
+
+        if (splitType.value === "exact") {
+            input.placeholder = p + " amount";
+        } else {
+            input.placeholder = p + " %";
+        }
+
+        splitInputsDiv.appendChild(input);
+    });
 }
 </script>
+
 </body>
 </html>

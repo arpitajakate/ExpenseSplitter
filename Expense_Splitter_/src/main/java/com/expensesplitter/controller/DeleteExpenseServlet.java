@@ -40,8 +40,6 @@ public class DeleteExpenseServlet extends HttpServlet {
 
             ps.close();
             conn.close();
-
-            // ✅ MUST MATCH YOUR CONTROLLER
             response.sendRedirect(request.getContextPath() + "/viewExpenses");
 
         } catch (Exception e) {

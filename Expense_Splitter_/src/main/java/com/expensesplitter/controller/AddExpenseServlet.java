@@ -3,63 +3,51 @@ package com.expensesplitter.controller;
 import com.expensesplitter.dao.ExpenseDAO;
 import com.expensesplitter.model.Expense;
 
-import jakarta.servlet.ServletException;
+import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @WebServlet("/addExpense")
 public class AddExpenseServlet extends HttpServlet {
 
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
             String desc = request.getParameter("description");
-            String amountStr = request.getParameter("amount");
+            double amount = Double.parseDouble(request.getParameter("amount"));
             String payer = request.getParameter("payer");
-            String participantsStr = request.getParameter("participants");
 
-            if (amountStr == null || payer == null || participantsStr == null) {
-                response.sendRedirect(request.getContextPath() + "/views/index.jsp");
-                return;
-            }
-
-            double amount = Double.parseDouble(amountStr);
+            String[] parts = request.getParameter("participants").split(",");
 
             List<String> participants = new ArrayList<>();
+            for (String p : parts) {
+                participants.add(p.trim());
+            }
 
-            for (String p : participantsStr.split(",")) {
-                if (p != null && !p.trim().isEmpty()) {
-                    participants.add(p.trim());
+            String splitType = request.getParameter("splitType");
+
+            Map<String, Double> map = new HashMap<>();
+
+            for (String p : participants) {
+                String val = request.getParameter("split_" + p);
+                if (val != null && !val.isEmpty()) {
+                    map.put(p, Double.parseDouble(val));
                 }
             }
 
             Expense exp = new Expense(desc, amount, payer);
 
-            ExpenseDAO dao = new ExpenseDAO();
-            dao.addExpense(exp, participants);
+            new ExpenseDAO().addExpense(exp, participants, splitType, map);
 
-           
-            response.sendRedirect(request.getContextPath() + "/viewExpenses");
+            response.sendRedirect("viewExpenses");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/views/index.jsp");
+            response.sendRedirect("views/index.jsp");
         }
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-
-       
-        response.sendRedirect(request.getContextPath() + "/views/index.jsp");
     }
 }
